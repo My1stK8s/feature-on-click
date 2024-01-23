@@ -1,0 +1,281 @@
+version: "3.4" 
+networks:
+  external:
+  internal:
+  auth:
+volumes:
+  python-data:
+  mssql-data:
+  postgres-data:
+  mongodb-data: 
+  redis-data:
+  clickhouse-data:
+  minio-data:
+  zookeeper-data:
+  zookeeper-logs:
+  kafka-data:
+  kafka-logs:
+services:    
+  mssql:
+    image: 192.168.0.44:5000/mssql-2017-fts-utils:latest
+    hostname: mssql
+    ports:
+      - "1433:1433"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 4096M
+    networks:
+      - internal
+      - auth
+      - external
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=OPjIXdNewDV4LCF8
+      - MSSQL_PID=Developer
+      
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+  postgres:
+    image: 192.168.0.44:5000/postgis:15
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 1024M
+    networks:
+      - internal
+      - auth
+      - external
+    environment:
+      - POSTGRES_DB=psql
+      - POSTGRES_PASSWORD=CoFZl3PjpwfZPEmO
+      - POSTGRES_USER=psqldev
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mongo:
+    image: 192.168.0.44:5000/mongo:3.4.24
+    hostname: mongodbs
+    ports:
+      - "27017:27017"
+    deploy:
+      restart_policy: 
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 1024M
+    networks:
+      - internal
+      - auth
+      - external
+    volumes:
+      - mongodb-data:/data/db
+  redis:
+    image: 192.168.0.44:5000/redis:7.2.2
+    hostname: redis
+    ports:
+      - "6379:6379"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - external
+      - internal
+      - auth
+    environment:
+      - REDIS_PASSWORD=BeP1pA11lWUG5ANw7E/J/ykmqYdUHrzXP4ijFFvpOEMnetnw64/HW/b/nXtHUQvhswhRrErpeox1ATIQ
+      - REDIS_DATABASES=32
+      - REDIS_PORT=6379
+    volumes:
+      - redis-data:/var/lib/redis
+  # # minio:
+  # #   image: 192.168.0.44:5000/minio:24z
+  # #   hostname: minio
+  # #   volumes:
+  # #    - minio-data:/data
+  # #   networks:
+  # #     - external
+  # #   ports:
+  # #     - "9001:9000"
+  # #     - "9002:9000"
+  # #   environment:
+  # #    - MINIO_ROOT_USER=minioadmin
+  # #    - MINIO_ROOT_PASSWORD=minioadmin
+  # #   deploy:
+  # #     restart_policy:
+  # #       condition: on-failure
+  # #       delay: 5s
+  # #       max_attempts: 3
+  # #       window: 120s
+  # #     replicas: 1
+  # #     resources:
+  # #       limits:
+  # #         memory: 256M
+  # #     labels:
+  # #       # traefik
+  # #       - traefik.enable=true
+  # #       - traefik.docker.network=external 
+
+  # #       # traefikv1
+  # #       - traefik.frontend.rule=Host:minio.example.com
+  # #       - traefik.port=9001   
+
+  # #       - traefik.console.frontend.rule=Host:minio-console.example.com
+  # #       - traefik.console.port=9002 
+
+  # #       # traefikv2 (death-by-labels, much?)
+  # #       - traefik.http.middlewares.redirect-https.redirectScheme.scheme=https
+  # #       - traefik.http.middlewares.redirect-https.redirectScheme.permanent=true
+
+  # #       - traefik.http.routers.minio-https.rule=Host(`сгкд`)
+  # #       - traefik.http.routers.minio-https.entrypoints=https
+  # #       - traefik.http.routers.minio-https.service=minio
+  # #       - traefik.http.routers.minio-http.rule=Host(`minio.example.com`)
+  # #       - traefik.http.routers.minio-http.entrypoints=http
+  # #       - traefik.http.routers.minio-http.middlewares=redirect-https
+  # #       - traefik.http.routers.minio-http.service=minio
+  # #       - traefik.http.services.minio.loadbalancer.server.port=9001
+
+  # #       - traefik.http.routers.minio-console-https.rule=Host(`minio-console.example.com`)
+  # #       - traefik.http.routers.minio-console-https.entrypoints=https
+  # #       - traefik.http.routers.minio-console-https.service=minio-console
+  # #       - traefik.http.routers.minio-console-http.rule=Host(`minio-console.example.com`)
+  # #       - traefik.http.routers.minio-console-http.entrypoints=http
+  # #       - traefik.http.routers.minio-console-http.middlewares=redirect-https
+  # #       - traefik.http.routers.minio-console-http.service=minio-console
+  # #       - traefik.http.services.minio-console.loadbalancer.server.port=9001
+
+  # #   command:  minio server /data --console-address ":9001"
+    
+  click:
+    image: 192.168.0.44:5000/clickhouse-server:21.3
+    hostname: click
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 512M
+    networks:
+      - internal
+      - auth
+      - external
+    environment:
+      - CLICKHOUSE_USER=devclick
+      - CLICKHOUSE_PASSWORD=9O4WpBlo5KENakGd
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+
+      # - ./clickhousefiles/users.xml:/etc/clickhouse-server/users.xml:ro
+      # - ./clickhousefiles/config.xml:/etc/clickhouse-server/config.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    stop_grace_period: 60s
+  zookeeper:
+    image: 192.168.0.44:5000/zookeeper:3.4.13
+    hostname: zookeeper
+    container_name: zookeeper
+    networks:
+      - external
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/logs
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  kafka:
+    image: 192.168.0.44:5000/kafka:3.2
+    hostname: kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    networks:
+      - external
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+      - kafka-logs:/var/lib/kafka/logs
+
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true" #Whether to automatically create topic
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_RETENTION_BYTES: -1
+      KAFKA_LOG_CLEANUP_POLICY: delete, compact
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      #KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.auth.SimpleAclAuthorizer
+      #KAFKA_SUPER_USERS: User:admin;User:superuser
+      #KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf"
+  python:
+    image: 192.168.0.44:5000/init-storage-tool:latest.master
+    hostname: python
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - external
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    volumes:
+      - python-data:/var/opt/python
+
+          
+  
+
+
+  
+  
+
+
+
+
