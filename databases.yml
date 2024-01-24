@@ -22,6 +22,9 @@ services:
     ports:
       - "1433:1433"
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -49,6 +52,9 @@ services:
     ports:
       - "5432:5432"
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -71,10 +77,14 @@ services:
 
   mongo:
     image: 192.168.0.44:5000/mongo:3.4.24
+    command: mongod --port 46927
     hostname: mongodbs
     ports:
-      - "27017:27017"
+      - "46927:46927"
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy: 
         condition: on-failure
         delay: 5s
@@ -96,6 +106,9 @@ services:
     ports:
       - "6379:6379"
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -115,64 +128,66 @@ services:
       - REDIS_PORT=6379
     volumes:
       - redis-data:/var/lib/redis
-  # # minio:
-  # #   image: 192.168.0.44:5000/minio:24z
-  # #   hostname: minio
-  # #   volumes:
-  # #    - minio-data:/data
-  # #   networks:
-  # #     - external
-  # #   ports:
-  # #     - "9001:9000"
-  # #     - "9002:9000"
-  # #   environment:
-  # #    - MINIO_ROOT_USER=minioadmin
-  # #    - MINIO_ROOT_PASSWORD=minioadmin
-  # #   deploy:
-  # #     restart_policy:
-  # #       condition: on-failure
-  # #       delay: 5s
-  # #       max_attempts: 3
-  # #       window: 120s
-  # #     replicas: 1
-  # #     resources:
-  # #       limits:
-  # #         memory: 256M
-  # #     labels:
-  # #       # traefik
-  # #       - traefik.enable=true
-  # #       - traefik.docker.network=external 
+  minio:
+    image: 192.168.0.44:5000/minio:24z
+    hostname: minio
+    volumes:
+     - minio-data:/data
+    networks:
+      - internal
+      - auth
+      - external
+    ports:
+      - "9001:9000"
+      - "9002:9000"
+    environment:
+     - MINIO_ROOT_USER=minioadmin
+     - MINIO_ROOT_PASSWORD=minioadmin
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 256M
+      labels:
+        # traefik
+        - traefik.enable=true
+        - traefik.docker.network=external 
 
-  # #       # traefikv1
-  # #       - traefik.frontend.rule=Host:minio.example.com
-  # #       - traefik.port=9001   
+        # traefikv1
+        - traefik.frontend.rule=Host:minio.example.com
+        - traefik.port=9001   
 
-  # #       - traefik.console.frontend.rule=Host:minio-console.example.com
-  # #       - traefik.console.port=9002 
+        - traefik.console.frontend.rule=Host:minio-console.example.com
+        - traefik.console.port=9002 
 
-  # #       # traefikv2 (death-by-labels, much?)
-  # #       - traefik.http.middlewares.redirect-https.redirectScheme.scheme=https
-  # #       - traefik.http.middlewares.redirect-https.redirectScheme.permanent=true
+        # traefikv2 (death-by-labels, much?)
+        - traefik.http.middlewares.redirect-https.redirectScheme.scheme=https
+        - traefik.http.middlewares.redirect-https.redirectScheme.permanent=true
 
-  # #       - traefik.http.routers.minio-https.rule=Host(`сгкд`)
-  # #       - traefik.http.routers.minio-https.entrypoints=https
-  # #       - traefik.http.routers.minio-https.service=minio
-  # #       - traefik.http.routers.minio-http.rule=Host(`minio.example.com`)
-  # #       - traefik.http.routers.minio-http.entrypoints=http
-  # #       - traefik.http.routers.minio-http.middlewares=redirect-https
-  # #       - traefik.http.routers.minio-http.service=minio
-  # #       - traefik.http.services.minio.loadbalancer.server.port=9001
+        - traefik.http.routers.minio-https.rule=Host(`сгкд`)
+        - traefik.http.routers.minio-https.entrypoints=https
+        - traefik.http.routers.minio-https.service=minio
+        - traefik.http.routers.minio-http.rule=Host(`minio.example.com`)
+        - traefik.http.routers.minio-http.entrypoints=http
+        - traefik.http.routers.minio-http.middlewares=redirect-https
+        - traefik.http.routers.minio-http.service=minio
+        - traefik.http.services.minio.loadbalancer.server.port=9001
 
-  # #       - traefik.http.routers.minio-console-https.rule=Host(`minio-console.example.com`)
-  # #       - traefik.http.routers.minio-console-https.entrypoints=https
-  # #       - traefik.http.routers.minio-console-https.service=minio-console
-  # #       - traefik.http.routers.minio-console-http.rule=Host(`minio-console.example.com`)
-  # #       - traefik.http.routers.minio-console-http.entrypoints=http
-  # #       - traefik.http.routers.minio-console-http.middlewares=redirect-https
-  # #       - traefik.http.routers.minio-console-http.service=minio-console
-  # #       - traefik.http.services.minio-console.loadbalancer.server.port=9001
+        - traefik.http.routers.minio-console-https.rule=Host(`minio-console.example.com`)
+        - traefik.http.routers.minio-console-https.entrypoints=https
+        - traefik.http.routers.minio-console-https.service=minio-console
+        - traefik.http.routers.minio-console-http.rule=Host(`minio-console.example.com`)
+        - traefik.http.routers.minio-console-http.entrypoints=http
+        - traefik.http.routers.minio-console-http.middlewares=redirect-https
+        - traefik.http.routers.minio-console-http.service=minio-console
+        - traefik.http.services.minio-console.loadbalancer.server.port=9001
 
-  # #   command:  minio server /data --console-address ":9001"
+    command:  minio server /data --console-address ":9001"
     
   click:
     image: 192.168.0.44:5000/clickhouse-server:21.3
@@ -181,6 +196,9 @@ services:
       - "8123:8123"
       - "9000:9000"
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -212,7 +230,13 @@ services:
     image: 192.168.0.44:5000/zookeeper:3.4.13
     hostname: zookeeper
     container_name: zookeeper
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
     networks:
+      - internal
+      - auth
       - external
     volumes:
       - zookeeper-data:/var/lib/zookeeper/data
@@ -224,16 +248,21 @@ services:
     image: 192.168.0.44:5000/kafka:3.2
     hostname: kafka
     container_name: kafka
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
     depends_on:
       - zookeeper
     networks:
+      - internal
+      - auth
       - external
     ports:
       - "9092:9092"
     volumes:
       - kafka-data:/var/lib/kafka/data
       - kafka-logs:/var/lib/kafka/logs
-
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -251,6 +280,9 @@ services:
     image: 192.168.0.44:5000/init-storage-tool:latest.master
     hostname: python
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy:
         condition: on-failure
         delay: 10s
@@ -261,14 +293,37 @@ services:
         limits:
           memory: 256M
     networks:
+      - internal
+      - auth
       - external
     depends_on:
       - postgres
+      - mssql
+      - mongo
+      - redis
+      - kafka
+      - zookeeper
+      - click
     ports:
       - "8000:8000"
     volumes:
       - python-data:/var/opt/python
-
+  elasticsearch:
+    image: 192.168.0.44:5000/elasticsearch:6.6.0
+    hostname: elasticsearch
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+    - 9200:9200
+    environment:
+      - cluster.name=elasticsearch
+      - node.name=node-1
+      - discovery.type=single-node
+    networks:
+      - internal
+      - auth
+      - external
           
   
 

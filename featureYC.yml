@@ -1,0 +1,3112 @@
+version: "3.4"
+networks:
+  external:
+  internal:
+  auth:
+services:
+  proxy:
+    image: 192.168.0.8:5000/proxy:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+    ports:
+      - "8001:8001"
+    environment:
+     - SW_ENV=feature15
+  auth-gateway:
+    image: 192.168.0.8:5000/auth-gateway:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - auth
+    environment:
+     - SW_ENV=feature15
+  auth:
+    image: 192.168.0.8:5000/auth:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      external:
+        aliases:
+          - sw_auth
+      internal:
+        aliases:
+          - sw_auth
+    environment:
+     - SW_ENV=feature15
+  api-external:
+    image: 192.168.0.8:5000/api-external:latest.CLAIM-147724
+    environment:
+      - SW_ENV=feature15
+    networks:
+      - auth
+      - internal
+    ports:
+      - "3033:80"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      replicas: 1
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 200M
+      update_config:
+        parallelism: 0
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost/ping_9dcq3z || exit 1
+      interval: 30s
+      timeout: 15s
+      retries: 3
+  registration:
+    image: 192.168.0.8:5000/registration:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+    environment:
+     - SW_ENV=feature15
+  user-manager:
+    image: 192.168.0.8:5000/user-manager:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  user-settings:
+    image: 192.168.0.8:5000/user-settings:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  password-hasher:
+    image: 192.168.0.8:5000/password-hasher:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+    environment:
+     - SW_ENV=feature15
+  image-service:
+    image: 192.168.0.8:5000/image-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+    environment:
+     - SW_ENV=feature15
+  logger-slack:
+    image: 192.168.0.8:5000/logger-slack:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+    environment:
+     - SW_ENV=feature15
+  chat-api:
+    image: 192.168.0.8:5000/chat-api:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  intercom-report:
+    image: 192.168.0.8:5000/intercom-report:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  hotel-static:
+    image: 192.168.0.8:5000/hotel-static:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  autocomplete-hotels:
+    image: 192.168.0.8:5000/autocomplete-hotels:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  autocomplete-airline:
+    image: 192.168.0.8:5000/autocomplete-airline:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  quality-notifier:
+    image: 192.168.0.8:5000/quality-notifier:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  favorites:
+    image: 192.168.0.8:5000/favorites:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  train-service:
+    image: 192.168.0.8:5000/train-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-service:
+    image: 192.168.0.8:5000/airline-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-tax-service:
+    image: 192.168.0.8:5000/airline-tax-service:latest.CLAIM-147724
+    hostname: airline-tax-service
+      
+
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-book-service:
+    image: 192.168.0.8:5000/airline-book-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  hotel-service:
+    image: 192.168.0.8:5000/hotel-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  aa-provider:
+    image: 192.168.0.8:5000/aa-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  academ-provider:
+    image: 192.168.0.8:5000/academ-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  ostrovok:
+    image: 192.168.0.8:5000/ostrovok:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+    - internal
+    - auth
+    environment:
+    - SW_ENV=feature15
+  bronevik-provider:
+    image: 192.168.0.8:5000/bronevik-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+    - internal
+    - auth
+    environment:
+    - SW_ENV=feature15
+  hotelbook-provider:
+    image: 192.168.0.8:5000/hotelbook-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+    - internal
+    - auth
+    environment:
+    - SW_ENV=feature15
+  portbilet-service:
+    image: 192.168.0.8:5000/portbilet-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  travel-policies:
+    image: 192.168.0.8:5000/travel-policies:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-aggregation:
+    image: 192.168.0.8:5000/airline-aggregation:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  feature-flags:
+    image: 192.168.0.8:5000/feature-flags:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  apply-travel-policies:
+    image: 192.168.0.8:5000/apply-travel-policies:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  telegram-bot:
+    image: 192.168.0.8:5000/telegram-bot:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  duplicates-trips:
+    image: 192.168.0.8:5000/duplicates-trips:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  files:
+    image: 192.168.0.8:5000/files:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  kiwi:
+    image: 192.168.0.8:5000/kiwi:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-joins-service:
+    image: 192.168.0.8:5000/airline-joins-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-manual-joins:
+    image: 192.168.0.8:5000/airline-manual-joins:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  amadeus:
+    image: 192.168.0.8:5000/amadeus:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+    - internal
+    - auth
+    environment:
+    - SW_ENV=feature15
+  s7-profi:
+    image: 192.168.0.8:5000/s7-profi:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+    - internal
+    - auth
+    environment:
+    - SW_ENV=feature15
+  s7-provider:
+    image: 192.168.0.8:5000/s7-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+    - internal
+    - auth
+    environment:
+    - SW_ENV=feature15
+  hotelrate:
+    image: 192.168.0.8:5000/hotelrate:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-search-service:
+    image: 192.168.0.8:5000/airline-search-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-fares:
+    image: 192.168.0.8:5000/airline-fares:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  autocomplete-trains:
+    image: 192.168.0.8:5000/autocomplete-trains:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  marketing-reports:
+    image: 192.168.0.8:5000/marketing-reports:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  hotel-analytics:
+    image: 192.168.0.8:5000/hotel-analytics:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  history:
+    image: 192.168.0.8:5000/history:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  intercom:
+    image: 192.168.0.8:5000/intercom:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  intercom-client:
+    image: 192.168.0.8:5000/intercom-client:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  informant:
+    image: 192.168.0.8:5000/informant:latest.CLAIM-147724
+    hostname: informant
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  pushservice:
+    image: 192.168.0.8:5000/pushservice:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  aeroexpress:
+    image: 192.168.0.8:5000/aeroexpress:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  zhdun:
+    image: 192.168.0.8:5000/zhdun:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+  trip-picture-service:
+    image: 192.168.0.8:5000/trip-picture-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  user-popup:
+    image: 192.168.0.8:5000/user-popup:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  train-analytics:
+    image: 192.168.0.8:5000/train-analytics:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  verification-code:
+    image: 192.168.0.8:5000/verification-code:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  booking-provider:
+    image: 192.168.0.8:5000/booking-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  employee-service:
+    image: 192.168.0.8:5000/employee-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  expense-report:
+    image: 192.168.0.8:5000/expense-report:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  signalr:
+    image: 192.168.0.8:5000/signalr:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+      - external
+    environment:
+      - SW_ENV=feature15
+  flights:
+    image: 192.168.0.8:5000/flights:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  booking-service-documents:
+    image: 192.168.0.8:5000/booking-service-documents:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  trip-service:
+    image: 192.168.0.8:5000/trip-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  trip-docs:
+    image: 192.168.0.8:5000/trip-docs:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  approve-service-report:
+    image: 192.168.0.8:5000/approve-service-report:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  timezone:
+    image: 192.168.0.8:5000/timezone:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  account-service-documents:
+    image: 192.168.0.8:5000/account-service-documents:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  hotel-service-dictionary:
+    image: 192.168.0.8:5000/hotel-service-dictionary:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  hotels3d:
+    image: 192.168.0.8:5000/hotels3d:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  user-analytics:
+    image: 192.168.0.8:5000/user-analytics:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  user-service:
+    image: 192.168.0.8:5000/user-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  hotel-compare:
+    image: 192.168.0.8:5000/hotel-compare:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      replicas: 1
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  hotel-region:
+    image: 192.168.0.8:5000/hotel-region:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      replicas: 1
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  account-service:
+    image: 192.168.0.8:5000/account-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  sms-service:
+    image: 192.168.0.8:5000/sms-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  providers-statistic:
+    image: 192.168.0.8:5000/providers-statistic:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+        - auth
+        - internal
+    environment:
+        - SW_ENV=feature15
+  intercom-service-reports:
+    image: 192.168.0.8:5000/intercom-service-reports:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  dayoff:
+    image: 192.168.0.8:5000/dayoff:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+  language-service-settings:
+    image: 192.168.0.8:5000/language-service-settings:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - external
+      - internal
+    environment:
+      - SW_ENV=feature15
+  travelline-provider:
+    image: 192.168.0.8:5000/travelline-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  currency:
+    image: 192.168.0.8:5000/currency:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  travel-approval:
+    image: 192.168.0.8:5000/travel-approval:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  yandex-tracker:
+    image: 192.168.0.8:5000/yandex-tracker:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  account-service-closing:
+    image: 192.168.0.8:5000/account-service-closing:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  notifier-service:
+    image: 192.168.0.8:5000/notifier-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  unione-service:
+    image: 192.168.0.8:5000/unione-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  mandrill-service:
+    image: 192.168.0.8:5000/mandrill-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  cart-service:
+    image: 192.168.0.8:5000/cart-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  enums-service:
+    image: 192.168.0.8:5000/enums-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  travel-policies-service:
+    image: 192.168.0.8:5000/travel-policies-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  analytics-service:
+    image: 192.168.0.8:5000/analytics-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  revise-act-service:
+    image: 192.168.0.8:5000/revise-act-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  yandex-taxi:
+    image: 192.168.0.8:5000/yandex-taxi:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  taxi-voucher:
+    image: 192.168.0.8:5000/taxi-voucher:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  taxi-service:
+    image: 192.168.0.8:5000/taxi-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  account-service-insurance:
+    image: 192.168.0.8:5000/account-service-insurance:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  special-bill-service:
+    image: 192.168.0.8:5000/special-bill-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  aeroflot:
+    image: 192.168.0.8:5000/aeroflot:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      replicas: 1
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  external-links:
+    image: 192.168.0.8:5000/external-links:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  citymobil-provider:
+    image: 192.168.0.8:5000/citymobil-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  trip-analytics:
+    image: 192.168.0.8:5000/trip-analytics:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  contract-hotel-provider:
+    image: 192.168.0.8:5000/contract-hotel-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  backoffice-reports:
+    image: 192.168.0.8:5000/backoffice-reports:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  direct-hotel-provider:
+    image: 192.168.0.8:5000/direct-hotel-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  tais-provider:
+    image: 192.168.0.8:5000/tais-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  expedia-provider:
+    image: 192.168.0.8:5000/expedia-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  account-service-billing:
+    image: 192.168.0.8:5000/account-service-billing:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  teletrain-provider:
+    image: 192.168.0.8:5000/teletrain-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  transfer-service:
+    image: 192.168.0.8:5000/transfer-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  iway-provider:
+    image: 192.168.0.8:5000/iway-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  autocomplete-transfers:
+    image: 192.168.0.8:5000/autocomplete-transfers:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  user-rights:
+    image: 192.168.0.8:5000/user-rights:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  logger:
+    image: 192.168.0.8:5000/logger:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+    environment:
+      - SW_ENV=feature15
+  carrotquest:
+    image: 192.168.0.8:5000/carrotquest:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+      - external
+    environment:
+      - SW_ENV=feature15
+  client-statistics:
+    image: 192.168.0.8:5000/client-statistics:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  access-settings:
+    image: 192.168.0.8:5000/access-settings:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  booking-service:
+    image: 192.168.0.8:5000/booking-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  limits-service:
+    image: 192.168.0.8:5000/limits-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  ones-service:
+    image: 192.168.0.8:5000/ones-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  train-scheme:
+    image: 192.168.0.8:5000/train-scheme:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  images:
+    image: 192.168.0.8:5000/images:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - external
+      - internal
+    environment:
+      - SW_ENV=feature15
+  im-provider:
+    image: 192.168.0.8:5000/im-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  mixvel-provider:
+    image: 192.168.0.8:5000/mixvel-provider:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  expense-report-approval:
+    image: 192.168.0.8:5000/expense-report-approval:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+      - external
+    environment:
+      - SW_ENV=feature15
+  hotel-aggregation:
+    image: 192.168.0.8:5000/hotel-aggregation:latest.CLAIM-147724    
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  upload-service:
+    image: 192.168.0.8:5000/upload-service:latest.CLAIM-147724    
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  vipzal-provider:
+    image: 192.168.0.8:5000/vipzal-provider:latest.CLAIM-147724    
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  viphall-service:
+    image: 192.168.0.8:5000/viphall-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  onlinepbx:
+    image: 192.168.0.8:5000/onlinepbx:latest.CLAIM-147724    
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  request-service:
+    image: 192.168.0.8:5000/request-service:latest.CLAIM-147724
+    hostname: request-service
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  pdf-generator:
+    image: 192.168.0.8:5000/pdf-generator:latest.CLAIM-147724
+    hostname: pdf-generator
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  document-aggregator:
+    image: 192.168.0.8:5000/document-aggregator:latest.CLAIM-147724
+    hostname: document-aggregator
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  simple-electronic-signature:
+    image: 192.168.0.8:5000/simple-electronic-signature:latest.CLAIM-147724
+    hostname: simple-electronic-signature
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  fuckup-service:
+    image: 192.168.0.8:5000/fuckup-service:latest.CLAIM-147724
+    hostname: fuckup-service
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  todo-service:        
+    image: 192.168.0.8:5000/todo-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - auth
+      - internal
+    environment:
+      - SW_ENV=feature15
+  toggle-features:
+    image: 192.168.0.8:5000/toggle-features:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15
+  airline-advice-service:
+    image: 192.168.0.8:5000/airline-advice-service:latest.CLAIM-147724
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 20M
+    networks:
+      - internal
+      - auth
+    environment:
+      - SW_ENV=feature15      
+  po-monolith:
+    image: 192.168.0.44:5000/po-monolith:latest.master
+    hostname: po-monolith
+    deploy:
+      placement:
+        constraints:
+          - node.labels.os == windows
+            #      endpoint_mode: dnsrr
+      replicas: 1
+    networks:
+      - internal
+    environment:
+     - SW_ENV=feature15
+  front-po:
+    image: 192.168.0.8:5000/front-po:latest.master
+    hostname: front-po
+    ports:
+      - "3001:80"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 512M
+    networks:
+      - internal
+      - auth
+      - external
+    environment:
+     - SW_ENV=feature15
+  front-bo:
+    hostname: front-bo
+    image: 192.168.0.8:5000/front-bo:latest.master
+    ports:
+      - "3002:80"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      replicas: 1
+      resources:
+        limits:
+          memory: 512M
+    networks:
+      - internal
+      - auth
+      - external
+    environment:
+     - SW_ENV=feature15
