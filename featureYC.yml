@@ -5,7 +5,7 @@ networks:
   auth:
 services:
   proxy:
-    image: 192.168.0.8:5000/proxy:latest.CLAIM-147724
+    image: 192.168.0.8:5000/proxy:latest.CLAIM-147725
     deploy:
       placement:
         constraints:
@@ -18,12 +18,14 @@ services:
           memory: 20M
     networks:
       - external
+      - internal
     ports:
-      - "8001:8001"
+      - "80:80"
+      - "443:443"
     environment:
      - SW_ENV=feature15
   auth-gateway:
-    image: 192.168.0.8:5000/auth-gateway:latest.CLAIM-147724
+    image: 192.168.0.8:5000/auth-gateway:latest.master
     deploy:
       placement:
         constraints:
@@ -45,7 +47,7 @@ services:
     environment:
      - SW_ENV=feature15
   auth:
-    image: 192.168.0.8:5000/auth:latest.CLAIM-147724
+    image: 192.168.0.8:5000/auth:latest.master
     deploy:
       placement:
         constraints:
@@ -71,7 +73,7 @@ services:
     environment:
      - SW_ENV=feature15
   api-external:
-    image: 192.168.0.8:5000/api-external:latest.CLAIM-147724
+    image: 192.168.0.8:5000/api-external:latest.master
     environment:
       - SW_ENV=feature15
     networks:
@@ -105,7 +107,7 @@ services:
       timeout: 15s
       retries: 3
   registration:
-    image: 192.168.0.8:5000/registration:latest.CLAIM-147724
+    image: 192.168.0.8:5000/registration:latest.master
     deploy:
       placement:
         constraints:
@@ -127,7 +129,7 @@ services:
     environment:
      - SW_ENV=feature15
   user-manager:
-    image: 192.168.0.8:5000/user-manager:latest.CLAIM-147724
+    image: 192.168.0.8:5000/user-manager:latest.master
     deploy:
       placement:
         constraints:
@@ -149,7 +151,7 @@ services:
     environment:
       - SW_ENV=feature15
   user-settings:
-    image: 192.168.0.8:5000/user-settings:latest.CLAIM-147724
+    image: 192.168.0.8:5000/user-settings:latest.master
     deploy:
       placement:
         constraints:
@@ -171,7 +173,7 @@ services:
     environment:
       - SW_ENV=feature15
   password-hasher:
-    image: 192.168.0.8:5000/password-hasher:latest.CLAIM-147724
+    image: 192.168.0.8:5000/password-hasher:latest.master
     deploy:
       placement:
         constraints:
@@ -192,7 +194,7 @@ services:
     environment:
      - SW_ENV=feature15
   image-service:
-    image: 192.168.0.8:5000/image-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/image-service:latest.master
     deploy:
       placement:
         constraints:
@@ -214,7 +216,7 @@ services:
     environment:
      - SW_ENV=feature15
   logger-slack:
-    image: 192.168.0.8:5000/logger-slack:latest.CLAIM-147724
+    image: 192.168.0.8:5000/logger-slack:latest.master
     deploy:
       placement:
         constraints:
@@ -235,7 +237,7 @@ services:
     environment:
      - SW_ENV=feature15
   chat-api:
-    image: 192.168.0.8:5000/chat-api:latest.CLAIM-147724
+    image: 192.168.0.8:5000/chat-api:latest.master
     deploy:
       placement:
         constraints:
@@ -257,7 +259,7 @@ services:
     environment:
       - SW_ENV=feature15
   intercom-report:
-    image: 192.168.0.8:5000/intercom-report:latest.CLAIM-147724
+    image: 192.168.0.8:5000/intercom-report:latest.master
     deploy:
       placement:
         constraints:
@@ -279,7 +281,7 @@ services:
     environment:
       - SW_ENV=feature15
   hotel-static:
-    image: 192.168.0.8:5000/hotel-static:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotel-static:latest.master
     deploy:
       placement:
         constraints:
@@ -301,7 +303,7 @@ services:
     environment:
       - SW_ENV=feature15
   autocomplete-hotels:
-    image: 192.168.0.8:5000/autocomplete-hotels:latest.CLAIM-147724
+    image: 192.168.0.8:5000/autocomplete-hotels:latest.master
     deploy:
       placement:
         constraints:
@@ -323,7 +325,7 @@ services:
     environment:
       - SW_ENV=feature15
   autocomplete-airline:
-    image: 192.168.0.8:5000/autocomplete-airline:latest.CLAIM-147724
+    image: 192.168.0.8:5000/autocomplete-airline:latest.master
     deploy:
       placement:
         constraints:
@@ -346,7 +348,7 @@ services:
     environment:
       - SW_ENV=feature15
   quality-notifier:
-    image: 192.168.0.8:5000/quality-notifier:latest.CLAIM-147724
+    image: 192.168.0.8:5000/quality-notifier:latest.master
     deploy:
       placement:
         constraints:
@@ -368,7 +370,7 @@ services:
     environment:
       - SW_ENV=feature15
   favorites:
-    image: 192.168.0.8:5000/favorites:latest.CLAIM-147724
+    image: 192.168.0.8:5000/favorites:latest.master
     deploy:
       placement:
         constraints:
@@ -390,7 +392,7 @@ services:
     environment:
       - SW_ENV=feature15
   train-service:
-    image: 192.168.0.8:5000/train-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/train-service:latest.master
     deploy:
       placement:
         constraints:
@@ -413,7 +415,7 @@ services:
     environment:
       - SW_ENV=feature15
   airline-service:
-    image: 192.168.0.8:5000/airline-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-service:latest.master
     deploy:
       placement:
         constraints:
@@ -435,10 +437,10 @@ services:
     environment:
       - SW_ENV=feature15
   airline-tax-service:
-    image: 192.168.0.8:5000/airline-tax-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-tax-service:latest.master
     hostname: airline-tax-service
-      
-
+    # extra_hosts:
+    #   - "redis:192.168.0.82"
     deploy:
       placement:
         constraints:
@@ -460,7 +462,7 @@ services:
     environment:
       - SW_ENV=feature15
   airline-book-service:
-    image: 192.168.0.8:5000/airline-book-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-book-service:latest.master
     deploy:
       placement:
         constraints:
@@ -482,7 +484,7 @@ services:
     environment:
       - SW_ENV=feature15
   hotel-service:
-    image: 192.168.0.8:5000/hotel-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotel-service:latest.master
     deploy:
       placement:
         constraints:
@@ -504,7 +506,7 @@ services:
     environment:
       - SW_ENV=feature15
   aa-provider:
-    image: 192.168.0.8:5000/aa-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/aa-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -526,7 +528,7 @@ services:
     environment:
       - SW_ENV=feature15
   academ-provider:
-    image: 192.168.0.8:5000/academ-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/academ-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -548,7 +550,7 @@ services:
     environment:
       - SW_ENV=feature15
   ostrovok:
-    image: 192.168.0.8:5000/ostrovok:latest.CLAIM-147724
+    image: 192.168.0.8:5000/ostrovok:latest.master
     deploy:
       placement:
         constraints:
@@ -570,7 +572,7 @@ services:
     environment:
     - SW_ENV=feature15
   bronevik-provider:
-    image: 192.168.0.8:5000/bronevik-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/bronevik-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -592,7 +594,7 @@ services:
     environment:
     - SW_ENV=feature15
   hotelbook-provider:
-    image: 192.168.0.8:5000/hotelbook-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotelbook-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -614,7 +616,9 @@ services:
     environment:
     - SW_ENV=feature15
   portbilet-service:
-    image: 192.168.0.8:5000/portbilet-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/portbilet-service:latest.master
+    extra_hosts:
+      - "click:192.168.0.82"
     deploy:
       placement:
         constraints:
@@ -636,7 +640,7 @@ services:
     environment:
       - SW_ENV=feature15
   travel-policies:
-    image: 192.168.0.8:5000/travel-policies:latest.CLAIM-147724
+    image: 192.168.0.8:5000/travel-policies:latest.master
     deploy:
       placement:
         constraints:
@@ -658,7 +662,7 @@ services:
     environment:
       - SW_ENV=feature15
   airline-aggregation:
-    image: 192.168.0.8:5000/airline-aggregation:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-aggregation:latest.master
     deploy:
       placement:
         constraints:
@@ -680,7 +684,7 @@ services:
     environment:
       - SW_ENV=feature15
   feature-flags:
-    image: 192.168.0.8:5000/feature-flags:latest.CLAIM-147724
+    image: 192.168.0.8:5000/feature-flags:latest.master
     deploy:
       placement:
         constraints:
@@ -702,7 +706,7 @@ services:
     environment:
       - SW_ENV=feature15
   apply-travel-policies:
-    image: 192.168.0.8:5000/apply-travel-policies:latest.CLAIM-147724
+    image: 192.168.0.8:5000/apply-travel-policies:latest.master
     deploy:
       placement:
         constraints:
@@ -724,7 +728,7 @@ services:
     environment:
       - SW_ENV=feature15
   telegram-bot:
-    image: 192.168.0.8:5000/telegram-bot:latest.CLAIM-147724
+    image: 192.168.0.8:5000/telegram-bot:latest.master
     deploy:
       placement:
         constraints:
@@ -747,7 +751,7 @@ services:
     environment:
       - SW_ENV=feature15
   duplicates-trips:
-    image: 192.168.0.8:5000/duplicates-trips:latest.CLAIM-147724
+    image: 192.168.0.8:5000/duplicates-trips:latest.master
     deploy:
       placement:
         constraints:
@@ -769,7 +773,7 @@ services:
     environment:
       - SW_ENV=feature15
   files:
-    image: 192.168.0.8:5000/files:latest.CLAIM-147724
+    image: 192.168.0.8:5000/files:latest.master
     deploy:
       placement:
         constraints:
@@ -792,7 +796,7 @@ services:
     environment:
       - SW_ENV=feature15
   kiwi:
-    image: 192.168.0.8:5000/kiwi:latest.CLAIM-147724
+    image: 192.168.0.8:5000/kiwi:latest.master
     deploy:
       placement:
         constraints:
@@ -814,7 +818,7 @@ services:
     environment:
       - SW_ENV=feature15
   airline-joins-service:
-    image: 192.168.0.8:5000/airline-joins-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-joins-service:latest.master
     deploy:
       placement:
         constraints:
@@ -836,7 +840,7 @@ services:
     environment:
       - SW_ENV=feature15
   airline-manual-joins:
-    image: 192.168.0.8:5000/airline-manual-joins:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-manual-joins:latest.master
     deploy:
       placement:
         constraints:
@@ -858,7 +862,10 @@ services:
     environment:
       - SW_ENV=feature15
   amadeus:
-    image: 192.168.0.8:5000/amadeus:latest.CLAIM-147724
+    image: 192.168.0.8:5000/amadeus:latest.master
+    extra_hosts:
+      # - "redis:192.168.0.82"
+      - "click:192.168.0.82"
     deploy:
       placement:
         constraints:
@@ -880,7 +887,7 @@ services:
     environment:
     - SW_ENV=feature15
   s7-profi:
-    image: 192.168.0.8:5000/s7-profi:latest.CLAIM-147724
+    image: 192.168.0.8:5000/s7-profi:latest.master
     deploy:
       placement:
         constraints:
@@ -902,7 +909,7 @@ services:
     environment:
     - SW_ENV=feature15
   s7-provider:
-    image: 192.168.0.8:5000/s7-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/s7-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -924,7 +931,7 @@ services:
     environment:
     - SW_ENV=feature15
   hotelrate:
-    image: 192.168.0.8:5000/hotelrate:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotelrate:latest.master
     deploy:
       placement:
         constraints:
@@ -946,7 +953,7 @@ services:
     environment:
       - SW_ENV=feature15
   airline-search-service:
-    image: 192.168.0.8:5000/airline-search-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-search-service:latest.master
     deploy:
       placement:
         constraints:
@@ -968,7 +975,7 @@ services:
     environment:
       - SW_ENV=feature15
   airline-fares:
-    image: 192.168.0.8:5000/airline-fares:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-fares:latest.master
     deploy:
       placement:
         constraints:
@@ -990,7 +997,7 @@ services:
     environment:
       - SW_ENV=feature15
   autocomplete-trains:
-    image: 192.168.0.8:5000/autocomplete-trains:latest.CLAIM-147724
+    image: 192.168.0.8:5000/autocomplete-trains:latest.master
     deploy:
       placement:
         constraints:
@@ -1012,7 +1019,7 @@ services:
     environment:
       - SW_ENV=feature15
   marketing-reports:
-    image: 192.168.0.8:5000/marketing-reports:latest.CLAIM-147724
+    image: 192.168.0.8:5000/marketing-reports:latest.master
     deploy:
       placement:
         constraints:
@@ -1034,7 +1041,7 @@ services:
     environment:
       - SW_ENV=feature15
   hotel-analytics:
-    image: 192.168.0.8:5000/hotel-analytics:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotel-analytics:latest.master
     deploy:
       placement:
         constraints:
@@ -1056,7 +1063,7 @@ services:
     environment:
       - SW_ENV=feature15
   history:
-    image: 192.168.0.8:5000/history:latest.CLAIM-147724
+    image: 192.168.0.8:5000/history:latest.master
     deploy:
       placement:
         constraints:
@@ -1078,7 +1085,7 @@ services:
     environment:
       - SW_ENV=feature15
   intercom:
-    image: 192.168.0.8:5000/intercom:latest.CLAIM-147724
+    image: 192.168.0.8:5000/intercom:latest.master
     deploy:
       placement:
         constraints:
@@ -1100,7 +1107,7 @@ services:
     environment:
       - SW_ENV=feature15
   intercom-client:
-    image: 192.168.0.8:5000/intercom-client:latest.CLAIM-147724
+    image: 192.168.0.8:5000/intercom-client:latest.master
     deploy:
       placement:
         constraints:
@@ -1122,7 +1129,9 @@ services:
     environment:
       - SW_ENV=feature15
   informant:
-    image: 192.168.0.8:5000/informant:latest.CLAIM-147724
+    image: 192.168.0.8:5000/informant:latest.master
+    extra_hosts:
+      - "click:192.168.0.82"
     hostname: informant
     deploy:
       placement:
@@ -1145,7 +1154,7 @@ services:
     environment:
       - SW_ENV=feature15
   pushservice:
-    image: 192.168.0.8:5000/pushservice:latest.CLAIM-147724
+    image: 192.168.0.8:5000/pushservice:latest.master
     deploy:
       placement:
         constraints:
@@ -1167,7 +1176,7 @@ services:
     environment:
       - SW_ENV=feature15
   aeroexpress:
-    image: 192.168.0.8:5000/aeroexpress:latest.CLAIM-147724
+    image: 192.168.0.8:5000/aeroexpress:latest.master
     deploy:
       placement:
         constraints:
@@ -1189,7 +1198,7 @@ services:
     environment:
       - SW_ENV=feature15
   zhdun:
-    image: 192.168.0.8:5000/zhdun:latest.CLAIM-147724
+    image: 192.168.0.8:5000/zhdun:latest.master
     deploy:
       placement:
         constraints:
@@ -1208,7 +1217,7 @@ services:
     networks:
       - external
   trip-picture-service:
-    image: 192.168.0.8:5000/trip-picture-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/trip-picture-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1231,7 +1240,7 @@ services:
     environment:
       - SW_ENV=feature15
   user-popup:
-    image: 192.168.0.8:5000/user-popup:latest.CLAIM-147724
+    image: 192.168.0.8:5000/user-popup:latest.master
     deploy:
       placement:
         constraints:
@@ -1253,7 +1262,7 @@ services:
     environment:
       - SW_ENV=feature15
   train-analytics:
-    image: 192.168.0.8:5000/train-analytics:latest.CLAIM-147724
+    image: 192.168.0.8:5000/train-analytics:latest.master
     deploy:
       placement:
         constraints:
@@ -1275,7 +1284,7 @@ services:
     environment:
       - SW_ENV=feature15
   verification-code:
-    image: 192.168.0.8:5000/verification-code:latest.CLAIM-147724
+    image: 192.168.0.8:5000/verification-code:latest.master
     deploy:
       placement:
         constraints:
@@ -1297,7 +1306,7 @@ services:
     environment:
       - SW_ENV=feature15
   booking-provider:
-    image: 192.168.0.8:5000/booking-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/booking-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -1319,7 +1328,7 @@ services:
     environment:
       - SW_ENV=feature15
   employee-service:
-    image: 192.168.0.8:5000/employee-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/employee-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1341,7 +1350,7 @@ services:
     environment:
       - SW_ENV=feature15
   expense-report:
-    image: 192.168.0.8:5000/expense-report:latest.CLAIM-147724
+    image: 192.168.0.8:5000/expense-report:latest.master
     deploy:
       placement:
         constraints:
@@ -1363,7 +1372,7 @@ services:
     environment:
       - SW_ENV=feature15
   signalr:
-    image: 192.168.0.8:5000/signalr:latest.CLAIM-147724
+    image: 192.168.0.8:5000/signalr:latest.master
     deploy:
       placement:
         constraints:
@@ -1386,7 +1395,7 @@ services:
     environment:
       - SW_ENV=feature15
   flights:
-    image: 192.168.0.8:5000/flights:latest.CLAIM-147724
+    image: 192.168.0.8:5000/flights:latest.master
     deploy:
       placement:
         constraints:
@@ -1408,7 +1417,7 @@ services:
     environment:
       - SW_ENV=feature15
   booking-service-documents:
-    image: 192.168.0.8:5000/booking-service-documents:latest.CLAIM-147724
+    image: 192.168.0.8:5000/booking-service-documents:latest.master
     deploy:
       placement:
         constraints:
@@ -1430,7 +1439,7 @@ services:
     environment:
       - SW_ENV=feature15
   trip-service:
-    image: 192.168.0.8:5000/trip-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/trip-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1452,7 +1461,7 @@ services:
     environment:
       - SW_ENV=feature15
   trip-docs:
-    image: 192.168.0.8:5000/trip-docs:latest.CLAIM-147724
+    image: 192.168.0.8:5000/trip-docs:latest.master
     deploy:
       placement:
         constraints:
@@ -1474,7 +1483,7 @@ services:
     environment:
       - SW_ENV=feature15
   approve-service-report:
-    image: 192.168.0.8:5000/approve-service-report:latest.CLAIM-147724
+    image: 192.168.0.8:5000/approve-service-report:latest.master
     deploy:
       placement:
         constraints:
@@ -1496,7 +1505,7 @@ services:
     environment:
       - SW_ENV=feature15
   timezone:
-    image: 192.168.0.8:5000/timezone:latest.CLAIM-147724
+    image: 192.168.0.8:5000/timezone:latest.master
     deploy:
       placement:
         constraints:
@@ -1518,7 +1527,7 @@ services:
     environment:
       - SW_ENV=feature15
   account-service-documents:
-    image: 192.168.0.8:5000/account-service-documents:latest.CLAIM-147724
+    image: 192.168.0.8:5000/account-service-documents:latest.master
     deploy:
       placement:
         constraints:
@@ -1540,7 +1549,7 @@ services:
     environment:
       - SW_ENV=feature15
   hotel-service-dictionary:
-    image: 192.168.0.8:5000/hotel-service-dictionary:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotel-service-dictionary:latest.master
     deploy:
       placement:
         constraints:
@@ -1562,7 +1571,7 @@ services:
     environment:
       - SW_ENV=feature15
   hotels3d:
-    image: 192.168.0.8:5000/hotels3d:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotels3d:latest.master
     deploy:
       placement:
         constraints:
@@ -1584,7 +1593,7 @@ services:
     environment:
       - SW_ENV=feature15
   user-analytics:
-    image: 192.168.0.8:5000/user-analytics:latest.CLAIM-147724
+    image: 192.168.0.8:5000/user-analytics:latest.master
     deploy:
       placement:
         constraints:
@@ -1606,7 +1615,7 @@ services:
     environment:
       - SW_ENV=feature15
   user-service:
-    image: 192.168.0.8:5000/user-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/user-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1628,7 +1637,7 @@ services:
     environment:
       - SW_ENV=feature15
   hotel-compare:
-    image: 192.168.0.8:5000/hotel-compare:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotel-compare:latest.master
     deploy:
       placement:
         constraints:
@@ -1640,7 +1649,7 @@ services:
     environment:
       - SW_ENV=feature15
   hotel-region:
-    image: 192.168.0.8:5000/hotel-region:latest.CLAIM-147724
+    image: 192.168.0.8:5000/hotel-region:latest.master
     deploy:
       placement:
         constraints:
@@ -1652,7 +1661,7 @@ services:
     environment:
       - SW_ENV=feature15
   account-service:
-    image: 192.168.0.8:5000/account-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/account-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1674,7 +1683,7 @@ services:
     environment:
       - SW_ENV=feature15
   sms-service:
-    image: 192.168.0.8:5000/sms-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/sms-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1696,7 +1705,7 @@ services:
     environment:
       - SW_ENV=feature15
   providers-statistic:
-    image: 192.168.0.8:5000/providers-statistic:latest.CLAIM-147724
+    image: 192.168.0.8:5000/providers-statistic:latest.master
     deploy:
       placement:
         constraints:
@@ -1718,7 +1727,7 @@ services:
     environment:
         - SW_ENV=feature15
   intercom-service-reports:
-    image: 192.168.0.8:5000/intercom-service-reports:latest.CLAIM-147724
+    image: 192.168.0.8:5000/intercom-service-reports:latest.master
     deploy:
       placement:
         constraints:
@@ -1740,7 +1749,7 @@ services:
     environment:
       - SW_ENV=feature15
   dayoff:
-    image: 192.168.0.8:5000/dayoff:latest.CLAIM-147724
+    image: 192.168.0.8:5000/dayoff:latest.master
     deploy:
       placement:
         constraints:
@@ -1759,7 +1768,7 @@ services:
     networks:
       - internal
   language-service-settings:
-    image: 192.168.0.8:5000/language-service-settings:latest.CLAIM-147724
+    image: 192.168.0.8:5000/language-service-settings:latest.master
     deploy:
       placement:
         constraints:
@@ -1782,7 +1791,7 @@ services:
     environment:
       - SW_ENV=feature15
   travelline-provider:
-    image: 192.168.0.8:5000/travelline-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/travelline-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -1804,7 +1813,7 @@ services:
     environment:
       - SW_ENV=feature15
   currency:
-    image: 192.168.0.8:5000/currency:latest.CLAIM-147724
+    image: 192.168.0.8:5000/currency:latest.master
     deploy:
       placement:
         constraints:
@@ -1826,7 +1835,7 @@ services:
     environment:
       - SW_ENV=feature15
   travel-approval:
-    image: 192.168.0.8:5000/travel-approval:latest.CLAIM-147724
+    image: 192.168.0.8:5000/travel-approval:latest.master
     deploy:
       placement:
         constraints:
@@ -1849,7 +1858,7 @@ services:
     environment:
       - SW_ENV=feature15
   yandex-tracker:
-    image: 192.168.0.8:5000/yandex-tracker:latest.CLAIM-147724
+    image: 192.168.0.8:5000/yandex-tracker:latest.master
     deploy:
       placement:
         constraints:
@@ -1871,7 +1880,7 @@ services:
     environment:
       - SW_ENV=feature15
   account-service-closing:
-    image: 192.168.0.8:5000/account-service-closing:latest.CLAIM-147724
+    image: 192.168.0.8:5000/account-service-closing:latest.master
     deploy:
       placement:
         constraints:
@@ -1893,7 +1902,7 @@ services:
     environment:
       - SW_ENV=feature15
   notifier-service:
-    image: 192.168.0.8:5000/notifier-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/notifier-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1915,7 +1924,7 @@ services:
     environment:
       - SW_ENV=feature15
   unione-service:
-    image: 192.168.0.8:5000/unione-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/unione-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1937,7 +1946,7 @@ services:
     environment:
       - SW_ENV=feature15
   mandrill-service:
-    image: 192.168.0.8:5000/mandrill-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/mandrill-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1959,7 +1968,7 @@ services:
     environment:
       - SW_ENV=feature15
   cart-service:
-    image: 192.168.0.8:5000/cart-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/cart-service:latest.master
     deploy:
       placement:
         constraints:
@@ -1981,7 +1990,7 @@ services:
     environment:
       - SW_ENV=feature15
   enums-service:
-    image: 192.168.0.8:5000/enums-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/enums-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2003,7 +2012,7 @@ services:
     environment:
       - SW_ENV=feature15
   travel-policies-service:
-    image: 192.168.0.8:5000/travel-policies-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/travel-policies-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2025,7 +2034,7 @@ services:
     environment:
       - SW_ENV=feature15
   analytics-service:
-    image: 192.168.0.8:5000/analytics-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/analytics-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2047,7 +2056,7 @@ services:
     environment:
       - SW_ENV=feature15
   revise-act-service:
-    image: 192.168.0.8:5000/revise-act-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/revise-act-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2069,7 +2078,7 @@ services:
     environment:
       - SW_ENV=feature15
   yandex-taxi:
-    image: 192.168.0.8:5000/yandex-taxi:latest.CLAIM-147724
+    image: 192.168.0.8:5000/yandex-taxi:latest.master
     deploy:
       placement:
         constraints:
@@ -2091,7 +2100,7 @@ services:
     environment:
       - SW_ENV=feature15
   taxi-voucher:
-    image: 192.168.0.8:5000/taxi-voucher:latest.CLAIM-147724
+    image: 192.168.0.8:5000/taxi-voucher:latest.master
     deploy:
       placement:
         constraints:
@@ -2113,7 +2122,7 @@ services:
     environment:
       - SW_ENV=feature15
   taxi-service:
-    image: 192.168.0.8:5000/taxi-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/taxi-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2135,7 +2144,7 @@ services:
     environment:
       - SW_ENV=feature15
   account-service-insurance:
-    image: 192.168.0.8:5000/account-service-insurance:latest.CLAIM-147724
+    image: 192.168.0.8:5000/account-service-insurance:latest.master
     deploy:
       placement:
         constraints:
@@ -2157,7 +2166,7 @@ services:
     environment:
       - SW_ENV=feature15
   special-bill-service:
-    image: 192.168.0.8:5000/special-bill-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/special-bill-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2179,7 +2188,7 @@ services:
     environment:
       - SW_ENV=feature15
   aeroflot:
-    image: 192.168.0.8:5000/aeroflot:latest.CLAIM-147724
+    image: 192.168.0.8:5000/aeroflot:latest.master
     deploy:
       placement:
         constraints:
@@ -2191,7 +2200,7 @@ services:
     environment:
       - SW_ENV=feature15
   external-links:
-    image: 192.168.0.8:5000/external-links:latest.CLAIM-147724
+    image: 192.168.0.8:5000/external-links:latest.master
     deploy:
       placement:
         constraints:
@@ -2214,7 +2223,7 @@ services:
     environment:
       - SW_ENV=feature15
   citymobil-provider:
-    image: 192.168.0.8:5000/citymobil-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/citymobil-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -2236,7 +2245,7 @@ services:
     environment:
       - SW_ENV=feature15
   trip-analytics:
-    image: 192.168.0.8:5000/trip-analytics:latest.CLAIM-147724
+    image: 192.168.0.8:5000/trip-analytics:latest.master
     deploy:
       placement:
         constraints:
@@ -2258,7 +2267,7 @@ services:
     environment:
       - SW_ENV=feature15
   contract-hotel-provider:
-    image: 192.168.0.8:5000/contract-hotel-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/contract-hotel-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -2280,7 +2289,7 @@ services:
     environment:
       - SW_ENV=feature15
   backoffice-reports:
-    image: 192.168.0.8:5000/backoffice-reports:latest.CLAIM-147724
+    image: 192.168.0.8:5000/backoffice-reports:latest.master
     deploy:
       placement:
         constraints:
@@ -2302,7 +2311,7 @@ services:
     environment:
       - SW_ENV=feature15
   direct-hotel-provider:
-    image: 192.168.0.8:5000/direct-hotel-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/direct-hotel-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -2324,7 +2333,7 @@ services:
     environment:
       - SW_ENV=feature15
   tais-provider:
-    image: 192.168.0.8:5000/tais-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/tais-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -2346,7 +2355,7 @@ services:
     environment:
       - SW_ENV=feature15
   expedia-provider:
-    image: 192.168.0.8:5000/expedia-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/expedia-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -2368,7 +2377,7 @@ services:
     environment:
       - SW_ENV=feature15
   account-service-billing:
-    image: 192.168.0.8:5000/account-service-billing:latest.CLAIM-147724
+    image: 192.168.0.8:5000/account-service-billing:latest.master
     deploy:
       placement:
         constraints:
@@ -2390,7 +2399,7 @@ services:
     environment:
       - SW_ENV=feature15
   teletrain-provider:
-    image: 192.168.0.8:5000/teletrain-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/teletrain-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -2412,7 +2421,7 @@ services:
     environment:
       - SW_ENV=feature15
   transfer-service:
-    image: 192.168.0.8:5000/transfer-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/transfer-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2434,7 +2443,9 @@ services:
     environment:
       - SW_ENV=feature15
   iway-provider:
-    image: 192.168.0.8:5000/iway-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/iway-provider:latest.master
+    extra_hosts:
+      - "click:192.168.0.82"
     deploy:
       placement:
         constraints:
@@ -2456,7 +2467,7 @@ services:
     environment:
       - SW_ENV=feature15
   autocomplete-transfers:
-    image: 192.168.0.8:5000/autocomplete-transfers:latest.CLAIM-147724
+    image: 192.168.0.8:5000/autocomplete-transfers:latest.master
     deploy:
       placement:
         constraints:
@@ -2478,7 +2489,7 @@ services:
     environment:
       - SW_ENV=feature15
   user-rights:
-    image: 192.168.0.8:5000/user-rights:latest.CLAIM-147724
+    image: 192.168.0.8:5000/user-rights:latest.master
     deploy:
       placement:
         constraints:
@@ -2500,7 +2511,7 @@ services:
     environment:
       - SW_ENV=feature15
   logger:
-    image: 192.168.0.8:5000/logger:latest.CLAIM-147724
+    image: 192.168.0.8:5000/logger:latest.master
     deploy:
       placement:
         constraints:
@@ -2521,7 +2532,7 @@ services:
     environment:
       - SW_ENV=feature15
   carrotquest:
-    image: 192.168.0.8:5000/carrotquest:latest.CLAIM-147724
+    image: 192.168.0.8:5000/carrotquest:latest.master
     deploy:
       placement:
         constraints:
@@ -2544,7 +2555,7 @@ services:
     environment:
       - SW_ENV=feature15
   client-statistics:
-    image: 192.168.0.8:5000/client-statistics:latest.CLAIM-147724
+    image: 192.168.0.8:5000/client-statistics:latest.master
     deploy:
       placement:
         constraints:
@@ -2566,7 +2577,7 @@ services:
     environment:
       - SW_ENV=feature15
   access-settings:
-    image: 192.168.0.8:5000/access-settings:latest.CLAIM-147724
+    image: 192.168.0.8:5000/access-settings:latest.master
     deploy:
       placement:
         constraints:
@@ -2588,7 +2599,7 @@ services:
     environment:
       - SW_ENV=feature15
   booking-service:
-    image: 192.168.0.8:5000/booking-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/booking-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2610,7 +2621,7 @@ services:
     environment:
       - SW_ENV=feature15
   limits-service:
-    image: 192.168.0.8:5000/limits-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/limits-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2632,7 +2643,7 @@ services:
     environment:
       - SW_ENV=feature15
   ones-service:
-    image: 192.168.0.8:5000/ones-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/ones-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2654,7 +2665,7 @@ services:
     environment:
       - SW_ENV=feature15
   train-scheme:
-    image: 192.168.0.8:5000/train-scheme:latest.CLAIM-147724
+    image: 192.168.0.8:5000/train-scheme:latest.master
     deploy:
       placement:
         constraints:
@@ -2676,7 +2687,7 @@ services:
     environment:
       - SW_ENV=feature15
   images:
-    image: 192.168.0.8:5000/images:latest.CLAIM-147724
+    image: 192.168.0.8:5000/images:latest.master
     deploy:
       placement:
         constraints:
@@ -2698,7 +2709,7 @@ services:
     environment:
       - SW_ENV=feature15
   im-provider:
-    image: 192.168.0.8:5000/im-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/im-provider:latest.master
     deploy:
       placement:
         constraints:
@@ -2720,7 +2731,9 @@ services:
     environment:
       - SW_ENV=feature15
   mixvel-provider:
-    image: 192.168.0.8:5000/mixvel-provider:latest.CLAIM-147724
+    image: 192.168.0.8:5000/mixvel-provider:latest.master
+    extra_hosts:
+      - "click:192.168.0.82"
     deploy:
       placement:
         constraints:
@@ -2742,7 +2755,7 @@ services:
     environment:
       - SW_ENV=feature15
   expense-report-approval:
-    image: 192.168.0.8:5000/expense-report-approval:latest.CLAIM-147724
+    image: 192.168.0.8:5000/expense-report-approval:latest.master
     deploy:
       placement:
         constraints:
@@ -2765,7 +2778,7 @@ services:
     environment:
       - SW_ENV=feature15
   hotel-aggregation:
-    image: 192.168.0.8:5000/hotel-aggregation:latest.CLAIM-147724    
+    image: 192.168.0.8:5000/hotel-aggregation:latest.master    
     deploy:
       placement:
         constraints:
@@ -2787,7 +2800,7 @@ services:
     environment:
       - SW_ENV=feature15
   upload-service:
-    image: 192.168.0.8:5000/upload-service:latest.CLAIM-147724    
+    image: 192.168.0.8:5000/upload-service:latest.master    
     deploy:
       placement:
         constraints:
@@ -2809,7 +2822,7 @@ services:
     environment:
       - SW_ENV=feature15
   vipzal-provider:
-    image: 192.168.0.8:5000/vipzal-provider:latest.CLAIM-147724    
+    image: 192.168.0.8:5000/vipzal-provider:latest.master    
     deploy:
       placement:
         constraints:
@@ -2831,7 +2844,7 @@ services:
     environment:
       - SW_ENV=feature15
   viphall-service:
-    image: 192.168.0.8:5000/viphall-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/viphall-service:latest.master
     deploy:
       placement:
         constraints:
@@ -2853,7 +2866,7 @@ services:
     environment:
       - SW_ENV=feature15
   onlinepbx:
-    image: 192.168.0.8:5000/onlinepbx:latest.CLAIM-147724    
+    image: 192.168.0.8:5000/onlinepbx:latest.master    
     deploy:
       placement:
         constraints:
@@ -2875,7 +2888,7 @@ services:
     environment:
       - SW_ENV=feature15
   request-service:
-    image: 192.168.0.8:5000/request-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/request-service:latest.master
     hostname: request-service
     deploy:
       placement:
@@ -2898,7 +2911,7 @@ services:
     environment:
       - SW_ENV=feature15
   pdf-generator:
-    image: 192.168.0.8:5000/pdf-generator:latest.CLAIM-147724
+    image: 192.168.0.8:5000/pdf-generator:latest.master
     hostname: pdf-generator
     deploy:
       placement:
@@ -2921,7 +2934,7 @@ services:
     environment:
       - SW_ENV=feature15
   document-aggregator:
-    image: 192.168.0.8:5000/document-aggregator:latest.CLAIM-147724
+    image: 192.168.0.8:5000/document-aggregator:latest.master
     hostname: document-aggregator
     deploy:
       placement:
@@ -2944,7 +2957,7 @@ services:
     environment:
       - SW_ENV=feature15
   simple-electronic-signature:
-    image: 192.168.0.8:5000/simple-electronic-signature:latest.CLAIM-147724
+    image: 192.168.0.8:5000/simple-electronic-signature:latest.master
     hostname: simple-electronic-signature
     deploy:
       placement:
@@ -2967,7 +2980,7 @@ services:
     environment:
       - SW_ENV=feature15
   fuckup-service:
-    image: 192.168.0.8:5000/fuckup-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/fuckup-service:latest.master
     hostname: fuckup-service
     deploy:
       placement:
@@ -2990,7 +3003,7 @@ services:
     environment:
       - SW_ENV=feature15
   todo-service:        
-    image: 192.168.0.8:5000/todo-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/todo-service:latest.master
     deploy:
       placement:
         constraints:
@@ -3012,7 +3025,7 @@ services:
     environment:
       - SW_ENV=feature15
   toggle-features:
-    image: 192.168.0.8:5000/toggle-features:latest.CLAIM-147724
+    image: 192.168.0.8:5000/toggle-features:latest.master
     deploy:
       placement:
         constraints:
@@ -3034,7 +3047,7 @@ services:
     environment:
       - SW_ENV=feature15
   airline-advice-service:
-    image: 192.168.0.8:5000/airline-advice-service:latest.CLAIM-147724
+    image: 192.168.0.8:5000/airline-advice-service:latest.master
     deploy:
       placement:
         constraints:
@@ -3071,9 +3084,10 @@ services:
   front-po:
     image: 192.168.0.8:5000/front-po:latest.master
     hostname: front-po
-    ports:
-      - "3001:80"
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -3092,9 +3106,10 @@ services:
   front-bo:
     hostname: front-bo
     image: 192.168.0.8:5000/front-bo:latest.master
-    ports:
-      - "3002:80"
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy:
         condition: on-failure
         delay: 5s

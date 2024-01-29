@@ -42,12 +42,11 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=OPjIXdNewDV4LCF8
       - MSSQL_PID=Developer
-      
     volumes:
       - mssql-data:/var/opt/mssql
-
+      - ./dbmssql:/app/dbmssql
   postgres:
-    image: 192.168.0.44:5000/postgis:15
+    image: 192.168.0.44:5000/postgis:15-3.4
     hostname: postgres
     ports:
       - "5432:5432"
@@ -69,12 +68,11 @@ services:
       - auth
       - external
     environment:
-      - POSTGRES_DB=psql
+      - POSTGRES_DB=postgres
       - POSTGRES_PASSWORD=CoFZl3PjpwfZPEmO
       - POSTGRES_USER=psqldev
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
   mongo:
     image: 192.168.0.44:5000/mongo:3.4.24
     command: mongod --port 46927
@@ -101,7 +99,7 @@ services:
     volumes:
       - mongodb-data:/data/db
   redis:
-    image: 192.168.0.44:5000/redis:7.2.2
+    image: 192.168.0.44:5000/redis:6.0.6
     hostname: redis
     ports:
       - "6379:6379"
@@ -144,6 +142,9 @@ services:
      - MINIO_ROOT_USER=minioadmin
      - MINIO_ROOT_PASSWORD=minioadmin
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -157,18 +158,14 @@ services:
         # traefik
         - traefik.enable=true
         - traefik.docker.network=external 
-
         # traefikv1
         - traefik.frontend.rule=Host:minio.example.com
         - traefik.port=9001   
-
         - traefik.console.frontend.rule=Host:minio-console.example.com
         - traefik.console.port=9002 
-
         # traefikv2 (death-by-labels, much?)
         - traefik.http.middlewares.redirect-https.redirectScheme.scheme=https
         - traefik.http.middlewares.redirect-https.redirectScheme.permanent=true
-
         - traefik.http.routers.minio-https.rule=Host(`сгкд`)
         - traefik.http.routers.minio-https.entrypoints=https
         - traefik.http.routers.minio-https.service=minio
@@ -177,7 +174,6 @@ services:
         - traefik.http.routers.minio-http.middlewares=redirect-https
         - traefik.http.routers.minio-http.service=minio
         - traefik.http.services.minio.loadbalancer.server.port=9001
-
         - traefik.http.routers.minio-console-https.rule=Host(`minio-console.example.com`)
         - traefik.http.routers.minio-console-https.entrypoints=https
         - traefik.http.routers.minio-console-https.service=minio-console
@@ -186,9 +182,7 @@ services:
         - traefik.http.routers.minio-console-http.middlewares=redirect-https
         - traefik.http.routers.minio-console-http.service=minio-console
         - traefik.http.services.minio-console.loadbalancer.server.port=9001
-
     command:  minio server /data --console-address ":9001"
-    
   click:
     image: 192.168.0.44:5000/clickhouse-server:21.3
     hostname: click
@@ -218,9 +212,6 @@ services:
       - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
     volumes:
       - clickhouse-data:/var/lib/clickhouse
-
-      # - ./clickhousefiles/users.xml:/etc/clickhouse-server/users.xml:ro
-      # - ./clickhousefiles/config.xml:/etc/clickhouse-server/config.xml:ro
     ulimits:
       nofile:
         soft: 262144
@@ -229,7 +220,6 @@ services:
   zookeeper:
     image: 192.168.0.44:5000/zookeeper:3.4.13
     hostname: zookeeper
-    container_name: zookeeper
     deploy:
       placement:
         constraints:
@@ -247,7 +237,6 @@ services:
   kafka:
     image: 192.168.0.44:5000/kafka:3.2
     hostname: kafka
-    container_name: kafka
     deploy:
       placement:
         constraints:
@@ -308,10 +297,14 @@ services:
       - "8000:8000"
     volumes:
       - python-data:/var/opt/python
+      - ./dbmssql:/app/dbmssql
   elasticsearch:
     image: 192.168.0.44:5000/elasticsearch:6.6.0
-    hostname: elasticsearch
+    hostname: elastic
     deploy:
+      placement:
+        constraints:
+          - node.labels.os == linux
       mode: replicated
       replicas: 1
     ports:
